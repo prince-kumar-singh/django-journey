@@ -77,3 +77,83 @@ urlpatterns = [
 ]
 ```
 
+
+**Added Templates and Static Files**
+
+1. Updated the `home` view to render an HTML template instead of returning plain text.
+2. Added a static CSS file to style the `home` page.
+3. Configured the `settings.py` file to include the `templates` and `static` directories.
+
+#### 📄 `Django/Django/views.py`
+```python
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def home(request):
+    # Render the home page using an HTML template
+    return render(request, 'website/index.html')
+
+def about(request):
+    return HttpResponse("Hello, world. You're at the about page.")
+
+def contact(request):
+    return HttpResponse("Hello, world. You're at the contact page.")
+```
+
+#### 📄 `Django/templates/website/index.html`
+```html
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <h1>Welcome to Django Journey</h1>
+</body>
+</html>
+```
+
+#### 📄 `Django/static/style.css`
+```css
+body {
+    background-color: #08153d;
+    color: #ffffff;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2em;
+}
+```
+
+#### 📄 `Django/Django/settings.py`
+```python
+# Added the templates directory
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],  # Added this line
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+# Added static files configuration
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+```
+
+---
+
+
