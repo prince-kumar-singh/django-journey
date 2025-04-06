@@ -230,15 +230,43 @@ INSTALLED_APPS = [
 ```
 
 ---
+**Enhanced `firstapp` with Template Inheritance**
 
-### 🛠️ Next Steps
+1. Updated the `all_firstapp` view to use a base template (`layout.html`) for template inheritance.
+2. Created a `layout.html` file to serve as the base template for all pages.
 
-1. **Extend Templates**: Add templates for the `about` and `contact` pages.
-2. **Dynamic Content**: Pass dynamic data to templates using Django's context.
-3. **Forms**: Implement forms for user input.
-4. **Testing**: Write unit tests to ensure the application works as expected.
-5. **Deployment**: Deploy the project to a hosting platform like Heroku or AWS.
+#### 📄 `Django/firstapp/templates/firstapp/all_firstapp.html`
+```html
+{% extends "layout.html" %}
 
-Stay tuned for more updates as I continue my Django journey!
+{% block title %}
+Firstapp Page
+{% endblock %}
+{% block content %}
+    <h1>All firstapp</h1>
+{% endblock %}
+```
 
+#### 📄 `Django/templates/layout.html`
+```html
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+        Default Title
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <nav>This is our Navbar</nav>
+    {% block content %}{% endblock %}
+</body>
+</html>
+```
 
+---
