@@ -270,3 +270,193 @@ Firstapp Page
 ```
 
 ---
+
+### ✅ (April 9, 2025)
+**Integrated Tailwind CSS with Django**
+
+To integrate Tailwind CSS with Django, follow the official installation guide:  
+[https://django-tailwind.readthedocs.io/en/latest/installation.html](https://django-tailwind.readthedocs.io/en/latest/installation.html)
+
+#### 📄 Key Steps:
+#### 📄 Key Steps: Tailwind CSS Setup in Django
+
+- 📦 Install `django-tailwind`:
+  ```bash
+  python -m pip install django-tailwind
+  ```
+
+- 💻 (Optional) For live reload support:
+  ```bash
+  python -m pip install 'django-tailwind[reload]'
+  ```
+
+- 🧪 (Optional) Install latest dev version:
+  ```bash
+  python -m pip install git+https://github.com/timonweb/django-tailwind.git
+  ```
+
+---
+
+- ⚙️ Add to `INSTALLED_APPS` in `settings.py`:
+  ```python
+  INSTALLED_APPS = [
+    'tailwind',
+  ]
+  ```
+
+- 🚀 Initialize Tailwind-compatible app:
+  ```bash
+  python manage.py tailwind init
+  ```
+
+- 🌀 (Optional) For Tailwind v3:
+  ```bash
+  python manage.py tailwind init --tailwind-version 3
+  ```
+
+- ➕ Add your new app (e.g., `theme`) to `INSTALLED_APPS`:
+  ```python
+  INSTALLED_APPS = [
+    'tailwind',
+    'theme',
+  ]
+  ```
+
+- 🏷️ Register Tailwind app name in `settings.py`:
+  ```python
+  TAILWIND_APP_NAME = 'theme'
+  ```
+
+---
+
+- 📁 Install Tailwind CSS dependencies:
+  ```bash
+  python manage.py tailwind install
+  ```
+
+- 🛑 (Optional) Skip package-lock:
+  ```bash
+  python manage.py tailwind install --no-package-lock
+  ```
+
+---
+
+- 🧩 Add Tailwind to your `base.html`:
+  ```html
+  {% load static tailwind_tags %}
+  <head>
+    ...
+    {% tailwind_css %}
+    ...
+  </head>
+  ```
+
+---
+
+- 🔄 Add live reload support (Optional):
+
+  - Add to `INSTALLED_APPS`:
+    ```python
+    INSTALLED_APPS = [
+      'tailwind',
+      'theme',
+      'django_browser_reload',
+    ]
+    ```
+
+  - Add middleware in `MIDDLEWARE`:
+    ```python
+    MIDDLEWARE = [
+      ...,
+      "django_browser_reload.middleware.BrowserReloadMiddleware",
+    ]
+    ```
+
+  - Include reload URLs in `urls.py`:
+    ```python
+    from django.urls import include, path
+
+    urlpatterns = [
+      ...,
+      path("__reload__/", include("django_browser_reload.urls")),
+    ]
+    ```
+
+---
+
+- 🚴‍♂️ Start Tailwind in development mode:
+  ```bash
+  python manage.py tailwind start
+  ```
+
+5. Run the Django development server in a separate terminal:
+   ```bash
+   python manage.py runserver
+   ```
+
+---
+
+### 📄 key changes:
+
+#### 📄 `Django/templates/layout.html`
+```html
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+        Default Title
+        {% endblock %}
+    </title>
+    {% tailwind_css %}
+</head>
+<body>
+    <nav class="bg-gray-800 text-white p-4">This is our Navbar</nav>
+    <div class="container mx-auto mt-4">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+```
+
+#### 📄 `Django/templates/website/index.html`
+```html
+{% extends "layout.html" %}
+
+{% block title %}
+Home Page
+{% endblock %}
+{% block content %}
+    <h1 class="text-3xl font-bold text-blue-600 bg-yellow-200 p-4 rounded-lg">Django | Home page</h1>
+{% endblock %}
+```
+
+#### 📄 `Django/theme/static_src/src/styles.css`
+```css
+@import "tailwindcss";
+```
+
+#### 📄 `Django/Django/settings.py`
+```python
+# Added Tailwind CSS integration
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'firstapp',
+    'tailwind',
+    'theme',  # Added this line
+]
+
+TAILWIND_APP_NAME = 'theme'
+```
+
+---
+
+
