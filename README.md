@@ -862,3 +862,116 @@ App Detail Page
 
 ---
 
+---
+
+
+**Added Forms and Enhanced `firstapp` with Store Search Functionality**
+
+1. Created a form to allow users to search for stores associated with a specific app variety.
+2. Added a new view to handle the form submission and display the search results.
+3. Updated templates to include the form and display the search results dynamically.
+
+---
+
+#### 📄 Required Terminal Commands:
+1. Apply migrations to ensure the database is up-to-date:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+2. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+---
+
+### 📄 Key Changes:
+
+#### 📄 `Django/firstapp/forms.py`
+```python
+from django import forms
+from .models import firstappVarity
+
+class FirstAppForm(forms.Form):
+    app_varity = forms.ModelChoiceField(queryset=firstappVarity.objects.all(), label="Select App Variety")
+```
+
+---
+
+#### 📄 `Django/firstapp/views.py`
+```python
+from django.shortcuts import render, get_object_or_404
+from .models import firstappVarity, Store
+from .forms import FirstAppForm
+
+def all_firstapp(request):
+    apps = firstappVarity.objects.all()
+    return render(request, 'firstapp/all_firstapp.html', {"apps": apps})
+
+def app_detail(request, app_id):
+    app = get_object_or_404(firstappVarity, pk=app_id)
+    return render(request, 'firstapp/app_details.html', {"app": app})
+
+def app_store_views(request):
+    stores = None
+    error_message = None
+    if request.method == 'POST':
+        form = FirstAppForm(request.POST)
+        if form.is_valid():
+            selected_app = form.cleaned_data['app_varity']
+            stores = Store.objects.filter(app_varity=selected_app)
+        else:
+            error_message = "Invalid form submission."
+    else:
+        form = FirstAppForm()
+    return render(request, 'firstapp/app_Stores.html', {'form': form, 'stores': stores, 'error_message': error_message})
+```
+
+---
+
+#### 📄 `Django/firstapp/urls.py`
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.all_firstapp, name='all_firstapp'),
+    path('<int:app_id>/', views.app_detail, name='app_details'),
+    path('app_Stores/', views.app_store_views, name='app_store_views'),
+]
+```
+
+---
+
+#### 📄 `Django/firstapp/templates/firstapp/app_Stores.html`
+```html
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Search Stores</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Search Store</button>
+</form>
+
+{% if stores %}
+    <h2>Stores Available</h2>
+    <ul>
+        {% for store in stores %}
+            <li>{{ store.name }} - {{ store.location }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+{% endblock %}
+```
+
+---
+
+
