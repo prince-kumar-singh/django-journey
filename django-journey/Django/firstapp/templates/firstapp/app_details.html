@@ -4,13 +4,23 @@
 App Detail Page
 {% endblock %}
 {% block content %}
-    <h1>App details</h1>
-    <h3>{{app.name}}</h3>
-    <h3>
-        {{app.description}}
-    </h3>
+    <h1>App Details</h1>
+    <h3>{{ app.name }}</h3>
+    <p>{{ app.description }}</p>
+    <img src="{{ app.image.url }}" alt="{{ app.name }}">
 
-    
-    
+    <h2>Reviews</h2>
+    <ul>
+        {% for review in app.reviews.all %}
+            <li>{{ review.user.username }}: {{ review.rating }} - {{ review.comment }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Certificate</h2>
+    {% if app.certificate %}
+        <p>Certificate Number: {{ app.certificate.certificate_number }}</p>
+        <p>Valid Until: {{ app.certificate.valid_until }}</p>
+    {% else %}
+        <p>No certificate available.</p>
+    {% endif %}
 {% endblock %}
-

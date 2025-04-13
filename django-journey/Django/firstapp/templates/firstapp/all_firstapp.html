@@ -4,25 +4,21 @@
 Firstapp Page
 {% endblock %}
 {% block content %}
-    <h1>all firstapp</h1>
+    <h1>All Firstapp</h1>
 
     <div class="grid grid-cols-3 gap-4">
-        {% for app in apps  %}
-            <div class='bg-blue-800 p-5 rounded'>
+        {% for app in apps %}
+            <div class="bg-blue-800 p-5 rounded">
                 <img class="rounded" src="{{ app.image.url }}" alt="{{ app.name }}">
-                <h3 class='text-2xl font-bold'>{{app.name}}</h3> 
+                <h3 class="text-2xl font-bold">{{ app.name }}</h3>
+                <p>{{ app.description }}</p>
                 <a href="{% url 'app_details' app.id %}">
                     <button
-                    type=""
-                    class ="inline-flex items-center w-[100%] justify-center px-4 py-2 border border-transparent text-sm font-medium  bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
-                    >
-                    {{app.name}}-{{app.id}}
-                </button>
+                        class="inline-flex items-center w-full justify-center px-4 py-2 border border-transparent text-sm font-medium bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                        View Details
+                    </button>
                 </a>
             </div>
-           
-        {% endfor  %}
+        {% endfor %}
     </div>
-    
 {% endblock %}
-

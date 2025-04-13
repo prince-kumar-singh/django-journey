@@ -684,4 +684,181 @@ urlpatterns = [
 
 ---
 
+---
+
+### ✅ (April 13, 2025)
+**Enhanced `firstapp` with Relationships and Admin Features**
+
+1. Added relationships (`OneToOne`, `OneToMany`, and `ManyToMany`) to the `firstapp` app models.
+2. Enhanced the Django admin interface with customizations for managing related models.
+3. Updated templates to display related data dynamically.
+
+---
+
+#### 📄 Required Terminal Commands:
+1. Apply migrations to create the database tables for the new models:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+2. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+---
+
+### 📄 Key Changes:
+
+#### 📄 `Django/firstapp/models.py`
+```python
+from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+class firstappVarity(models.Model):
+    APP_CHOICE = [
+        ('C', 'commercial'),
+        ('P', 'personal'),
+        ('E', 'enterprise'),
+        ('B', 'business'),
+        ('S', 'startup'),
+        ('O', 'other'),
+    ]
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='images/')
+    date_added = models.DateTimeField(default=timezone.now)
+    type = models.CharField(max_length=2, choices=APP_CHOICE, default='C')
+    description = models.TextField(default='')
+
+    def __str__(self):
+        return self.name
+
+class AppReview(models.Model):
+    app = models.ForeignKey(firstappVarity, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField()
+    comment = models.TextField()
+    date_added = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.app.name} - {self.rating}'
+
+class Store(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    app_varity = models.ManyToManyField(firstappVarity, related_name='stores')
+
+    def __str__(self):
+        return self.name
+
+class AppCertificate(models.Model):
+    app = models.OneToOneField(firstappVarity, on_delete=models.CASCADE, related_name='certificate')
+    certificate_number = models.CharField(max_length=100)
+    issue_date = models.DateField(default=timezone.now)
+    valid_until = models.DateTimeField()
+
+    def __str__(self):
+        return f'Certificate for {self.app.name}'
+```
+
+---
+
+#### 📄 `Django/firstapp/admin.py`
+```python
+from django.contrib import admin
+from .models import firstappVarity, AppReview, Store, AppCertificate
+
+class firstappReviewInline(admin.TabularInline):
+    model = AppReview
+    extra = 2
+
+class firstappVarityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'date_added')
+    search_fields = ('name', 'description')
+    list_filter = ('type', 'date_added')
+    inlines = [firstappReviewInline]
+
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'location')
+    search_fields = ('name', 'location')
+    filter_horizontal = ('app_varity',)
+    list_filter = ('app_varity',)
+
+class firstappCertificateAdmin(admin.ModelAdmin):
+    list_display = ('app', 'certificate_number', 'issue_date', 'valid_until')
+    search_fields = ('app__name', 'certificate_number')
+    list_filter = ('issue_date', 'valid_until')
+    raw_id_fields = ('app',)
+
+admin.site.register(firstappVarity, firstappVarityAdmin)
+admin.site.register(AppReview)
+admin.site.register(Store, StoreAdmin)
+admin.site.register(AppCertificate, firstappCertificateAdmin)
+```
+
+---
+
+#### 📄 `Django/firstapp/templates/firstapp/all_firstapp.html`
+```html
+{% extends "layout.html" %}
+
+{% block title %}
+Firstapp Page
+{% endblock %}
+{% block content %}
+    <h1>All Firstapp</h1>
+
+    <div class="grid grid-cols-3 gap-4">
+        {% for app in apps %}
+            <div class="bg-blue-800 p-5 rounded">
+                <img class="rounded" src="{{ app.image.url }}" alt="{{ app.name }}">
+                <h3 class="text-2xl font-bold">{{ app.name }}</h3>
+                <p>{{ app.description }}</p>
+                <a href="{% url 'app_details' app.id %}">
+                    <button
+                        class="inline-flex items-center w-full justify-center px-4 py-2 border border-transparent text-sm font-medium bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                        View Details
+                    </button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+```
+
+---
+
+#### 📄 `Django/firstapp/templates/firstapp/app_details.html`
+```html
+{% extends "layout.html" %}
+
+{% block title %}
+App Detail Page
+{% endblock %}
+{% block content %}
+    <h1>App Details</h1>
+    <h3>{{ app.name }}</h3>
+    <p>{{ app.description }}</p>
+    <img src="{{ app.image.url }}" alt="{{ app.name }}">
+
+    <h2>Reviews</h2>
+    <ul>
+        {% for review in app.reviews.all %}
+            <li>{{ review.user.username }}: {{ review.rating }} - {{ review.comment }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Certificate</h2>
+    {% if app.certificate %}
+        <p>Certificate Number: {{ app.certificate.certificate_number }}</p>
+        <p>Valid Until: {{ app.certificate.valid_until }}</p>
+    {% else %}
+        <p>No certificate available.</p>
+    {% endif %}
+{% endblock %}
+```
+
+---
 
